@@ -24,6 +24,19 @@ class seqset :
 
 	"""
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 	def __init__(self, source) :
 		"""
 		Help here ?
@@ -47,18 +60,89 @@ class seqset :
 			return
 
 
+		# Generate static members
+		self.update()
 		
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+	def __str__(self) :
+		summary = \
+"GenePy sequence set :\n-- %d sequences\n-- Mean length : %.01f (min %d, max %d)\n \
+-- C+G content : %.03f\n-- From file : %s\n" % \
+		(self.len, 
+		np.array(self.seq_len).mean(), np.min(self.seq_len), np.max(self.seq_len),  
+		(self.statistics["C"].mean() + self.statistics["G"].mean()),
+		self.filename.split("/")[-1])
+
+		return summary
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	def __repr__(self) :
+		return "GenePy seqset : %f" % self.filename
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	def update(self) :
+
 		# Number of sequences
 		self.len = len(self.seq)
 
-
-
 		# Sequence lengths
 		self.seq_len = np.array([len(s.seq) for s in self.seq])
+
+		# Alignment numerical array
+		l = self.seq_len.max() if type(self.seq_len) == np.ndarray else self.seq_len
+		self.array = genepy.alignmentarray(self.seq, length = l)
+
+		# Statistics
+		self.statistics = genepy.calcstats(self.seq)
+
+
+
+
+
 
 
 
@@ -70,8 +154,13 @@ class seqset :
 
 	# Show sequences
 	def show(self) :
-		self.array = genepy.alignmentarray(self.seq, length = self.seq_len.max())
 		genepy.showalignment(self.array)
+
+
+
+
+
+
 
 
 
@@ -82,21 +171,61 @@ class seqset :
 	# Align sequences 
 	def align(self, force = True, iter = False, full = False, full_iter = False, auto = True, threads = False) :
 
-		# Generate ClustalO command
-		command = genepy.align(self.filename, force, threads, full, full_iter, iter, auto)
-		print "Calling :    %s" % command
+		# System call to ClustalO
+		genepy.align(self.filename, force, threads, full, full_iter, iter, auto)
 
-		# System call
-		os.system(command)
-
-
-
-
+		# Read alignment back in
+		self.seq = genepy.readalignment(self.filename.split(".")[0] + "_aligned_genepy.phy")
+		
+		# Update static members
+		self.update()
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+	def phylotree(self, nucleotide_frequency = "empirical", bootstrap = -4, search_algorithm = "BEST") :
+
+		if not os.path.isfile(self.filename.split(".")[0] + "_aligned_genepy.phy") :
+			print "GenePy can't find an aligned sequence file for %s.\nTry calling .align()." % \
+			self.filename.split("/")[-1]
+
+			return
+
+
+		genepy.phylotree(self.filename, nucleotide_frequency, bootstrap, search_algorithm)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	def stats(self) :
+
+		# Display statistics
+		genepy.stats(self.statistics)
 
 
 
