@@ -392,3 +392,35 @@ def phylotree(filename, nucleotide_frequency, bootstrap, search_algorithm) :
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def trimalignment(alignment, array = None, left = None, right = None) :
+
+	if array is not None :
+		array[np.where(array > 0)] = 1
+		density = np.sum(array, axis=0)
+		# Currently, no auto-guessing. Soon !
+
+
+	else :
+		X = []
+
+		for seq in alignment :
+			X.append(seq[left:right])
+
+		return X
+
+
+

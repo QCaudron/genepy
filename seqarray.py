@@ -229,3 +229,21 @@ class seqset :
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+	def trimalignment(self, array = None, left = None, right = None) :
+
+		self.seq = genepy.trimalignment(self.seq, array, left, right)
+		self.update()
+
+
+
