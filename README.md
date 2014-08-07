@@ -12,11 +12,11 @@ Dependencies :
 - [BioPython](http://biopython.org "BioPython")
 - [Clustal Omega](http://www.clustal.org/omega)
 - [PhyML](https://code.google.com/p/phyml)
-- [scikit-Learn](http://scikit-learn.org)
 
 Optional :
 
 - [seaborn](https://github.com/mwaskom/seaborn)
+- [scikit-learn](http://scikit-learn.org)
 
 
 
@@ -75,7 +75,7 @@ Our sequence array is now shorter in terms of nucleotides per sequence. We're co
 
 	mysequences.stats()
 
-![Sequence statistics](tutorial_images/figure_3.png)
+![Sequence statistics](tutorial_images/figure_4.png)
 
 This shows us the average nucleotide content, distributions of nucleotide frequencies across difference sequences, and the frequencies of two-step nucleotide transitions. We see that there's a very high cytosine and guanine content, and that cytosines tend to be followed by more cytosines, although CpG and GpC are also common. The high C+G content is an interesting feature of the rubella virus, which is somewhat of an outlier in this respect amongst ssRNA viruses.
 
@@ -92,6 +92,11 @@ Function Members
 
 A visual representation of the sequences in the `seqarray`. 
 
+***
+
+
+
+
 
 	.stats()
 
@@ -99,6 +104,11 @@ Display :
 - the nucleotide content
 - the distributions of nucleotide frequencies over each sequence as estimated kernel densities ( if scikit-learn is installed ) or as a histogram ( if scikit-learn is not found )
 - the two-step transition matrix between nucleotides ( frequency of having an A going to a C, etc. )
+
+***
+
+
+
 
 
 
@@ -118,6 +128,7 @@ Align the sequences in the `seqarray` by calling Clustal Omega.
 
 
 
+***
 
 	.trimalignment(array = None, left = None, right = None)
 
@@ -127,6 +138,10 @@ Remove a number of nucleotides to the left and right of the sequence array. This
 - `right` :
 
 
+
+
+
+***
 
 	.phylotree(nucleotide_frequency = "empirical", bootstrap = -4, search_algorithm = "BEST")
 
