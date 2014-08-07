@@ -208,6 +208,15 @@ def align(filename, force, threads, full, full_iter, iter, auto) :
 		os.system(command)
 
 
+	# Rewrite the file using BioPython, as ClustalO output fails in PhyML
+	"""
+	s = readalignment(filename.split(".")[0] + "_aligned_genepy.phy")
+
+	f = open(filename.split(".")[0] + "_aligned_genepy.phy", "w")
+	SeqIO.write(s, f, "phylip")
+	f.close()
+	"""
+
 
 
 
@@ -232,6 +241,8 @@ def calcstats(seq) :
 	stats["G"] = []
 	stats["T"] = []
 	stats["transition"] = np.zeros((4, 4))
+
+	#stats["lengths"] = 
 
 	for a in seq :
 		stats["A"].append(a.seq.count("A") / float(len(a.seq)))
