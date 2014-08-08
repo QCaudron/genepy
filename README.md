@@ -20,15 +20,11 @@ Optional :
 
 
 
-Sequence Arrays
-===============
-
-The core data structure in **GenePy** is the *sequence array*, or `seqarray` object. It acts as a container for a list of sequences, and has member functions for sequence alignment and display, for trimming sequences, for showing sequence array statistics, and for constructing phylogenetic trees.
 
 
 
 Example Usage
--------------
+=============
 
 We have a file in FASTA format from [GenBank](http://www.ncbi.nlm.nih.gov/genbank)<sup>4</sup>, containing 31 sequences from the [Rubella virus](http://en.wikipedia.org/wiki/Rubella_virus) genome. Let's import the sequences and display them.
 
@@ -85,6 +81,26 @@ Let's construct a phylogenetic tree from this alignment, once again using
 
 
 
+
+
+
+
+Sequence Arrays
+===============
+
+
+The core data structure in **GenePy** is the *sequence array*, or `seqarray` object. It acts as a container for a list of sequences, and has member functions for sequence alignment and display, for trimming sequences, for showing sequence array statistics, and for constructing phylogenetic trees.
+
+
+
+Heavy-Lifting Packages
+----------------------
+
+**GenePy** makes system calls to ClustalO and PhyML. Some of the description of these packages, their usage, and their command-line arguments, are taken from their respective documentation, such as the ClustalO [README](http://www.clustal.org/omega/README) file and the PhyML [Manual](http://www.atgc-montpellier.fr/download/papers/phyml_manual_2012.pdf).
+
+
+
+
 Function Members
 ----------------
 
@@ -117,14 +133,16 @@ Displays :
 
 	.align(force = True, iter = False, full = False, full_iter = False, auto = True, threads = False)
 
-Align the sequences in the `seqarray` by calling Clustal Omega. 
+Align the sequences in the `seqarray` by calling Clustal Omega. Sequences are clustered into a guide tree, which is used to guide a progressive alignment.
 
-- `force` : overwrite the filename, if the alignment exists. The filename defaults to the filename of the sequence you passed on creation of the sequence array, without the extension, and with `_aligned_genepy.phy` appended. 
-- `iter` : the number of combined guide tree / HMM iterations
-- `full` : use the full distance matrix for guide-tree calculation; `False` uses mBed<sup>3</sup> instead
-- `full_iter` :
-- `auto` :
-- `threads` :
+Arguments are command-line arguments to ClustalO.
+
+- `force` : overwrite the filename, if the output alignment file exists. The filename defaults to the filename of the sequence you passed on creation of the sequence array, without the extension, and with `_aligned_genepy.phy` appended. 
+- `iter` : the number of guide tree iterations. By default, no iteration of the guide tree is done. Iteration generates an alignment from the guide tree, then uses this alignment to generate a new guide tree. This iterated alignment procedure could give rise to better alignments at a linear cost in alignment time.
+- `full` : use the full distance matrix for guide-tree calculation; default uses the fast clustering algorithm, mBed<sup>5</sup> instead of constructing a full distance matrix. mBed calculates a reduced set of pairwise distances.
+- `full_iter` : use the full distance matrix for guide-tree calculation during guide-tree iteration only.
+- `auto` : sets options automatically, selecting options for both speed and accuracy according to the number of sequences. This could overwrite some of your other arguments. `auto = False` is automatically set if any of `iter`, `full`, or `full_iter` are set to `True`.
+- `threads` : the number of threads to use for the parallelised part of the alignment. By default, ClustalO will use as many cores as are available; `threads` can be used to limit core usage.
 
 
 
@@ -137,10 +155,7 @@ Align the sequences in the `seqarray` by calling Clustal Omega.
 
 	.trimalignment(array = None, left = None, right = None)
 
-Remove a number of nucleotides to the left and right of the sequence array. This is useful when you have aligned a number of sequences of different lengths, and want to consider only a full array, where each sequence has the same length.
-
-- `left` : 
-- `right` :
+Remove `left` nucleotides from the beginning and `right` nucleotides from the end of the sequence array. This is useful when you have aligned a number of sequences of different lengths, and want to consider only a full array, where each sequence has the same length. Currently, this method does not automatically find a reasonable truncation zone. As such, `array` must be `None`, and `left` and `right` must be indices. Will probably get rid of the `array` parameter later and just have `left` and `right` as optional arguments.
 
 
 
@@ -154,9 +169,9 @@ Remove a number of nucleotides to the left and right of the sequence array. This
 
 Construct a phylogenetic tree by calling PhyML.
 
-- `nucleotide_frequency` :
-- `bootstrap` :
-- `search_algorithm` :
+- `nucleotide_frequency` : equilibrium nucleotide frequencies. Can be `empirical` or `max_likelihood`. Will make this a better argument setup later.
+- `bootstrap` : bootstrap analysis of internal branch support. Integers &gt 0 set the number of bootstrap replicates; `bootstrap = 0` turns off bootstrapping. In addition, values of `-1` run approximate likelihood ratio tests returning aLRT statistics; `-2` returns Chi<sup>2</sup> based parametric branch supports, and `-4` gives SH-like branch supports only.
+- `search_algorithm` : algorithm for tree searching. Options are `NNI` for nearest neighbour interchange, `SPR` for subtree pruning and regrafting, and `BEST` for the best of NNI and SPR methods.
 
 
 	
@@ -200,5 +215,5 @@ References
 1. Cock, PJ *et al.*, *Biopython: freely available Python tools for computational molecular biology and bioinformatics*. [Bioinformatics **25**, 1422](http://bioinformatics.oxfordjournals.org/content/25/11/1422.long), 2009
 2. Sievers, F *et al.*, *Fast, scalable generation of high‐quality protein multiple sequence alignments using Clustal Omega*. [Molecular Systems Biology **7**, 539](http://msb.embopress.org/content/7/1/539), 2011
 3. Guindon, S *et al.*, *New Algorithms and Methods to Estimate Maximum-Likelihood Phylogenies: Assessing the Performance of PhyML 3.0.* [Systematic Biology **59**, 307](http://sysbio.oxfordjournals.org/content/59/3/307), 2010
-4. Benson, DA *et al.*, *Genbank*. [Nucleic Acid Residues **41 (D1)**, D36](http://nar.oxfordjournals.org/content/41/D1/D36.long), 2013
+4. Benson, DA *et al.*, *Genbank*. [Nucleic Acid Research **41 (D1)**, D36](http://nar.oxfordjournals.org/content/41/D1/D36.long), 2013
 5. Blackshields, G *et al.*, *Sequence embedding for fast construction of guide trees for multiple sequence alignment*. [Algorithms for Molecular Biology **5**, 21](http://www.almob.org/content/5/1/21), 2010
