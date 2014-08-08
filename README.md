@@ -3,7 +3,7 @@ GenePy
 
 Pronounced *génépi*, like the [French alpine spirit](http://en.wikipedia.org/wiki/G%C3%A9n%C3%A9pi).
 
-**GenePy** is a Python package that acts as an interface between BioPython, ClustalO, and PhyML, all in a neat data structure. 
+**GenePy** is a Python package that acts as an interface between BioPython,<sup>1</sup> ClustalO,<sup>2</sup> and PhyML,<sup>3</sup> for manipulating nucleotide sequences, all in a neat data structure. 
 
 Dependencies :
 --------------
@@ -30,12 +30,12 @@ The core data structure in **GenePy** is the *sequence array*, or `seqarray` obj
 Example Usage
 -------------
 
+We have a file in FASTA format from [GenBank](http://www.ncbi.nlm.nih.gov/genbank)<sup>4</sup>, containing 31 sequences from the [Rubella virus](http://en.wikipedia.org/wiki/Rubella_virus) genome. Let's import the sequences and display them.
+
 	import genepy
 
-	# Import an array of sequences in FASTA format.
 	mysequences = genepy.seqarray("rubellaE1.fasta")
 
-	# Show the sequences.
 	mysequences.show()
 
 
@@ -88,19 +88,22 @@ Let's construct a phylogenetic tree from this alignment, once again using
 Function Members
 ----------------
 
+**Visual representation of array sequence**
+
 	.show()
 
-A visual representation of the sequences in the `seqarray`. 
+A visual representation of the sequences in the `seqarray`. Each nucleotide has its own colour; black is an empty site or an unknown nucleotide.
 
 ***
 
 
 
+**Sequence array statistics**
 
 
 	.stats()
 
-Display :
+Displays :
 - the nucleotide content
 - the distributions of nucleotide frequencies over each sequence as estimated kernel densities ( if scikit-learn is installed ) or as a histogram ( if scikit-learn is not found )
 - the two-step transition matrix between nucleotides ( frequency of having an A going to a C, etc. )
@@ -110,15 +113,15 @@ Display :
 
 
 
-
+**Align sequences**
 
 	.align(force = True, iter = False, full = False, full_iter = False, auto = True, threads = False)
 
 Align the sequences in the `seqarray` by calling Clustal Omega. 
 
 - `force` : overwrite the filename, if the alignment exists. The filename defaults to the filename of the sequence you passed on creation of the sequence array, without the extension, and with `_aligned_genepy.phy` appended. 
-- `iter` :
-- `full` :
+- `iter` : the number of combined guide tree / HMM iterations
+- `full` : use the full distance matrix for guide-tree calculation; `False` uses mBed<sup>3</sup> instead
 - `full_iter` :
 - `auto` :
 - `threads` :
@@ -129,6 +132,8 @@ Align the sequences in the `seqarray` by calling Clustal Omega.
 
 
 ***
+
+**Trim an alignment**
 
 	.trimalignment(array = None, left = None, right = None)
 
@@ -143,9 +148,11 @@ Remove a number of nucleotides to the left and right of the sequence array. This
 
 ***
 
+**Construct a phylogenetic tree**
+
 	.phylotree(nucleotide_frequency = "empirical", bootstrap = -4, search_algorithm = "BEST")
 
-Construct a phylogenetic tree by calling PhyML. 
+Construct a phylogenetic tree by calling PhyML.
 
 - `nucleotide_frequency` :
 - `bootstrap` :
@@ -184,3 +191,14 @@ Soon, **GenePy** will be installable using *pip* or *easy_install*. Until then, 
 	import genepy
 
 You can add this directory to your Python path temporarily. I'm hoping to have **GenePy** on the PyPI at some point in the future for easy installation.
+
+
+
+References
+==========
+
+1. Cock, PJ *et al.*, *Biopython: freely available Python tools for computational molecular biology and bioinformatics*. [Bioinformatics **25**, 1422](http://bioinformatics.oxfordjournals.org/content/25/11/1422.long), 2009
+2. Sievers, F *et al.*, *Fast, scalable generation of high‐quality protein multiple sequence alignments using Clustal Omega*. [Molecular Systems Biology **7**, 539](http://msb.embopress.org/content/7/1/539), 2011
+3. Guindon, S *et al.*, *New Algorithms and Methods to Estimate Maximum-Likelihood Phylogenies: Assessing the Performance of PhyML 3.0.* [Systematic Biology **59**, 307](http://sysbio.oxfordjournals.org/content/59/3/307), 2010
+4. Benson, DA *et al.*, *Genbank*. [Nucleic Acid Residues **41 (D1)**, D36](http://nar.oxfordjournals.org/content/41/D1/D36.long), 2013
+5. Blackshields, G *et al.*, *Sequence embedding for fast construction of guide trees for multiple sequence alignment*. [Algorithms for Molecular Biology **5**, 21](http://www.almob.org/content/5/1/21), 2010
