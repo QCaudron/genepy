@@ -3,12 +3,12 @@ GenePy
 
 Pronounced *génépi*, like the [French alpine spirit](http://en.wikipedia.org/wiki/G%C3%A9n%C3%A9pi).
 
-**GenePy** is a Python package that acts as an interface between BioPython,<sup>1</sup> ClustalO,<sup>2</sup> and PhyML,<sup>3</sup> for manipulating nucleotide sequences, all in a neat data structure. 
+**GenePy** is a Python package that acts as an interface between BioPython,[<sup>1</sup>](#references) ClustalO,[<sup>2</sup>](#references) and PhyML,[<sup>3</sup>](#references) for manipulating nucleotide sequences, all in a neat data structure. 
 
 Dependencies :
 --------------
 
-- [The Scipy stack](http://scipy.org) ( NumPy, Matplotlib, pandas )
+- [The Scipy stack](http://scipy.org) ( NumPy, Matplotlib )
 - [BioPython](http://biopython.org "BioPython")
 - [Clustal Omega](http://www.clustal.org/omega)
 - [PhyML](https://code.google.com/p/phyml)
@@ -26,13 +26,15 @@ Optional :
 Example Usage
 =============
 
-We have a file in FASTA format from [GenBank](http://www.ncbi.nlm.nih.gov/genbank)<sup>4</sup>, containing 31 sequences from the [Rubella virus](http://en.wikipedia.org/wiki/Rubella_virus) genome. Let's import the sequences and display them.
+We have a file in [FASTA](http://en.wikipedia.org/wiki/FASTA_format) format from [GenBank](http://www.ncbi.nlm.nih.gov/genbank),[<sup>4</sup>](#references) containing 31 sequences from the [Rubella virus](http://en.wikipedia.org/wiki/Rubella_virus) genome. Let's import the sequences and display them.
 
-	import genepy
+```python
+import genepy
 
-	mysequences = genepy.seqarray("rubellaE1.fasta")
+mysequences = genepy.seqarray("rubellaE1.fasta")
 
-	mysequences.show()
+mysequences.show()
+```
 
 
 ![.show() - visually display the sequence array](tutorial_images/figure_1.png)
@@ -139,7 +141,7 @@ Arguments are command-line arguments to ClustalO.
 
 - `force` : overwrite the filename, if the output alignment file exists. The filename defaults to the filename of the sequence you passed on creation of the sequence array, without the extension, and with `_aligned_genepy.phy` appended. 
 - `iter` : the number of guide tree iterations. By default, no iteration of the guide tree is done. Iteration generates an alignment from the guide tree, then uses this alignment to generate a new guide tree. This iterated alignment procedure could give rise to better alignments at a linear cost in alignment time.
-- `full` : use the full distance matrix for guide-tree calculation; default uses the fast clustering algorithm, mBed<sup>5</sup> instead of constructing a full distance matrix. mBed calculates a reduced set of pairwise distances.
+- `full` : use the full distance matrix for guide-tree calculation; default uses the fast clustering algorithm, mBed[<sup>5</sup>](#references) instead of constructing a full distance matrix. mBed calculates a reduced set of pairwise distances.
 - `full_iter` : use the full distance matrix for guide-tree calculation during guide-tree iteration only.
 - `auto` : sets options automatically, selecting options for both speed and accuracy according to the number of sequences. This could overwrite some of your other arguments. `auto = False` is automatically set if any of `iter`, `full`, or `full_iter` are set to `True`.
 - `threads` : the number of threads to use for the parallelised part of the alignment. By default, ClustalO will use as many cores as are available; `threads` can be used to limit core usage.
@@ -211,6 +213,8 @@ You can add this directory to your Python path temporarily. I'm hoping to have *
 
 References
 ==========
+
+<a name="references"></a>
 
 1. Cock, PJ *et al.*, *Biopython: freely available Python tools for computational molecular biology and bioinformatics*. [Bioinformatics **25**, 1422](http://bioinformatics.oxfordjournals.org/content/25/11/1422.long), 2009
 2. Sievers, F *et al.*, *Fast, scalable generation of high‐quality protein multiple sequence alignments using Clustal Omega*. [Molecular Systems Biology **7**, 539](http://msb.embopress.org/content/7/1/539), 2011
