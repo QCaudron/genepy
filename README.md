@@ -41,7 +41,9 @@ mysequences.show()
 
 They're not aligned, and one is much longer than the others. Let's dig a little deeper by printing a summary of the sequence array.
 
-	print mysequences
+```python
+print mysequences
+```
 
 This returns :
 
@@ -53,19 +55,24 @@ This returns :
 
 We have a wide range of sequence lengths. Most are small, but based on the visualisation, we have one that's probably a full genome. Our next step will be to align them and cut away parts of sequences that we don't have enough duplicates for.
 
-
-	mysequences.align()
+```python
+mysequences.align()
+```python
 
 We've aligned the sequences with the default **GenePy** arguments to Clustal Omega. A new file was written to disk : `rubellaE1_aligned_genepy.phy`. This file, in PHYLIP file format, acts as a checkpoint for your future work. Let's visualise the result.
 
+```python
 	mysequences.show()
+```
 
 ![Updated visualisation after sequence alignment](tutorial_images/figure_2.png)
 
 Most of the sequences belong to the E1 glycoprotein gene. Let's trim excess from the left and right, so we're comparing like with like.
 
-	mysequences.trimalignment(left = 8700, right = 9500)
-	mysequences.show()
+```python
+mysequences.trimalignment(left = 8700, right = 9500)
+mysequences.show()
+```
 
 ![Updated visualisation after sequence trimming](tutorial_images/figure_3.png)
 
@@ -108,7 +115,9 @@ Function Members
 
 **Visual representation of array sequence**
 
+```python
 	.show()
+```
 
 A visual representation of the sequences in the `seqarray`. Each nucleotide has its own colour; black is an empty site or an unknown nucleotide.
 
@@ -118,8 +127,9 @@ A visual representation of the sequences in the `seqarray`. Each nucleotide has 
 
 **Sequence array statistics**
 
-
-	.stats()
+```python
+.stats()
+```
 
 Displays :
 - the nucleotide content
@@ -133,7 +143,9 @@ Displays :
 
 **Align sequences**
 
-	.align(force = True, iter = False, full = False, full_iter = False, auto = True, threads = False)
+```python
+.align(force = True, iter = False, full = False, full_iter = False, auto = True, threads = False)
+```
 
 Align the sequences in the `seqarray` by calling Clustal Omega. Sequences are clustered into a guide tree, which is used to guide a progressive alignment.
 
@@ -155,7 +167,9 @@ Arguments are command-line arguments to ClustalO.
 
 **Trim an alignment**
 
-	.trimalignment(array = None, left = None, right = None)
+```python
+.trimalignment(array = None, left = None, right = None)
+```
 
 Remove `left` nucleotides from the beginning and `right` nucleotides from the end of the sequence array. This is useful when you have aligned a number of sequences of different lengths, and want to consider only a full array, where each sequence has the same length. Currently, this method does not automatically find a reasonable truncation zone. As such, `array` must be `None`, and `left` and `right` must be indices. Will probably get rid of the `array` parameter later and just have `left` and `right` as optional arguments.
 
@@ -167,7 +181,9 @@ Remove `left` nucleotides from the beginning and `right` nucleotides from the en
 
 **Construct a phylogenetic tree**
 
-	.phylotree(nucleotide_frequency = "empirical", bootstrap = -4, search_algorithm = "BEST")
+```python
+.phylotree(nucleotide_frequency = "empirical", bootstrap = -4, search_algorithm = "BEST")
+```
 
 Construct a phylogenetic tree by calling PhyML.
 
@@ -205,7 +221,9 @@ Installation
 
 Soon, **GenePy** will be installable using *pip* or *easy_install*. Until then, it's still built as a full Python package, so if you're in a directory where you can see the `genepy/` folder ( but not inside it ), you can just call
 
-	import genepy
+```python
+import genepy
+```
 
 You can add this directory to your Python path temporarily. I'm hoping to have **GenePy** on the PyPI at some point in the future for easy installation.
 
