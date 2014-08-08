@@ -62,7 +62,7 @@ mysequences.align()
 We've aligned the sequences with the default **GenePy** arguments to Clustal Omega. A new file was written to disk : `rubellaE1_aligned_genepy.phy`. This file, in PHYLIP file format, acts as a checkpoint for your future work. Let's visualise the result.
 
 ```python
-	mysequences.show()
+mysequences.show()
 ```
 
 ![Updated visualisation after sequence alignment](tutorial_images/figure_2.png)
@@ -110,8 +110,8 @@ Heavy-Lifting Packages
 
 
 
-Function Members
-----------------
+Sequence Array Object Member Functions
+--------------------------------------
 
 **Visual representation of array sequence**
 
@@ -196,8 +196,8 @@ Construct a phylogenetic tree by calling PhyML.
 
 
 
-Variable Members
-------------
+Sequencey Array Object Member Variables
+---------------------------------------
 
 - `.seq` - a Python list of BioPython sequence objects ( from `Bio.Seq.Seq` )
 - `.len` - the number of sequences in the sequence array
