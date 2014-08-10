@@ -42,7 +42,7 @@ mysequences.show()
 They're not aligned, and one is much longer than the others. Let's dig a little deeper by printing a summary of the sequence array.
 
 ```python
-print mysequences
+mysequences
 ```
 
 This returns :
@@ -71,6 +71,7 @@ Most of the sequences belong to the E1 glycoprotein gene. Let's trim excess from
 
 ```python
 mysequences.trimalignment(left = 8700, right = 9500)
+
 mysequences.show()
 ```
 
@@ -78,7 +79,9 @@ mysequences.show()
 
 Our sequence array is now shorter in terms of nucleotides per sequence. We're considering the same parts of the genome for each sequence, so we can start to look at the nucleotide statistics.
 
-	mysequences.stats()
+```python
+mysequences.stats()
+```
 
 ![Sequence statistics](tutorial_images/figure_4.png)
 
@@ -102,21 +105,21 @@ The core data structure in **GenePy** is the *sequence array*, or `seqarray` obj
 
 
 
-Heavy-Lifting Packages
+Workhorse Packages
+------------------
+
+**GenePy** makes system calls to ClustalO and PhyML, which do the heavy lifting. Some of the description of these packages, their usage, and their command-line arguments which follows is taken from their respective documentation, such as the ClustalO [README](http://www.clustal.org/omega/README) file and the PhyML [Manual](http://www.atgc-montpellier.fr/download/papers/phyml_manual_2012.pdf).
+
+
+
+
+Sequence Array Methods
 ----------------------
-
-**GenePy** makes system calls to ClustalO and PhyML. Some of the description of these packages, their usage, and their command-line arguments, are taken from their respective documentation, such as the ClustalO [README](http://www.clustal.org/omega/README) file and the PhyML [Manual](http://www.atgc-montpellier.fr/download/papers/phyml_manual_2012.pdf).
-
-
-
-
-Sequence Array Object Member Functions
---------------------------------------
 
 **Visual representation of array sequence**
 
 ```python
-	.show()
+.show()
 ```
 
 A visual representation of the sequences in the `seqarray`. Each nucleotide has its own colour; black is an empty site or an unknown nucleotide.
@@ -152,8 +155,8 @@ Align the sequences in the `seqarray` by calling Clustal Omega. Sequences are cl
 Arguments are command-line arguments to ClustalO.
 
 - `force` : overwrite the filename, if the output alignment file exists. The filename defaults to the filename of the sequence you passed on creation of the sequence array, without the extension, and with `_aligned_genepy.phy` appended. 
-- `iter` : the number of guide tree iterations. By default, no iteration of the guide tree is done. Iteration generates an alignment from the guide tree, then uses this alignment to generate a new guide tree. This iterated alignment procedure could give rise to better alignments at a linear cost in alignment time.
-- `full` : use the full distance matrix for guide-tree calculation; default uses the fast clustering algorithm, mBed[<sup>5</sup>](#references) instead of constructing a full distance matrix. mBed calculates a reduced set of pairwise distances.
+- `iter` : the integer number of guide tree iterations. By default, no iteration of the guide tree is done. Iteration generates an alignment from the guide tree, then uses this alignment to generate a new guide tree. This iterated alignment procedure could give rise to better alignments at a linear cost in alignment time. Set to `False` for no iteration.
+- `full` : use the full distance matrix for guide-tree calculation; default uses the fast clustering algorithm, mBed[<sup>5</sup>](#references) instead of constructing a full distance matrix. mBed calculates a reduced set of pairwise distances. Use `True` to iterate.
 - `full_iter` : use the full distance matrix for guide-tree calculation during guide-tree iteration only.
 - `auto` : sets options automatically, selecting options for both speed and accuracy according to the number of sequences. This could overwrite some of your other arguments. `auto = False` is automatically set if any of `iter`, `full`, or `full_iter` are set to `True`.
 - `threads` : the number of threads to use for the parallelised part of the alignment. By default, ClustalO will use as many cores as are available; `threads` can be used to limit core usage.
@@ -196,12 +199,37 @@ Construct a phylogenetic tree by calling PhyML.
 
 
 
-Sequencey Array Object Member Variables
----------------------------------------
+Sequencey Array Member Variables
+--------------------------------
 
 - `.seq` - a Python list of BioPython sequence objects ( from `Bio.Seq.Seq` )
 - `.len` - the number of sequences in the sequence array
-- `.seq_len` - a Python list of sequence lengths
+
+
+
+
+Sequence Array Iteration
+------------------------
+
+Sequence array objects can be iterated over. The iterables are [BioPython `Bio.Seq`](http://biopython.org/wiki/Seq) objects. For example :
+
+```python
+for record in mysequences :
+	print "%s \n%s \n" % (record.id, record.seq)
+```
+
+may return :
+
+```
+gi|538511347|gb|KF593861.1| 
+CACCGGGCCCCTTGGGGCTGAAATTCAAGACCGTCCGCCCGGTTGCCCTGCCACGCGCGTTCGCACCACCCCGCAATGCGCGTGTGACCGGGTGTTACCAGTGCGGCACCCCCGCGCTGGTGGAAGGCCTTGCCCCCGGGGGGGGCAATTGCCATCTCACTGTCAATGGCGAGGATGTCGGCGCCTTCCCCCCTGGGAAGTTCGTCACCGCCGCCCTCCTCAACACCCCCCCGCCCTACCAAGTCAGCTGCGGGGGCGAGAGCGATCGCGCGAGCGCGCGGGTCATCGACCCCGCCGCGCAATCGTTTACCGG
+
+gi|513136723|gb|JX546593.1| 
+TCTCCGTAGCCGGCGTGTCGTGCAATGTTACCACTGAACACCCGTTCTGCAACACGCCGCACGGACAACTCGAGGTCCAGGTCCCGCCCGACCCTGGGGACCTGGTTGAGTACATTATGAATTACACCGGCAATCAACAGTCCCGGTGGGGCCTCGGGAGCCCGAACTGTCATGGCCCCGATTGGGCCTCCCCGGTTTGCCAACGCCATTCCCCTGACTGCTCGCGGCTTGTGGGGGCCACGCCAGAGCGTCCCCGGCTGCGCCTGGTTGACGCCGATGACCCCCTGCTGCGCACCGCCCCTGGGCCCGGCGAGGTGTGGGTCACGCCTGTCATAGGCTCTCAGGCGCGCAAGTGCGGACTCCACATACGCGCTGGACCGTACGGCCATGCTACCGTCGAAATGCCCGAGTGGATCCACGCCCACACCACCAGCGACCCTTGGCACCCACCGGGCCCCTTGGGGCTGAAGTTTAAGACGGTTCGCCCGGTGGTCCTGCCACGCGCGTTGGCGCCGCCCCGCAATGTGCGTGTGACCGGGTGCTACCAGTGCGGCACGCCCGCGCTGGTGGAAGGCCTTGCCCCCGGGGGAGGGAA
+
+```
+
+
 
 
 

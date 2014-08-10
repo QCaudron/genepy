@@ -58,11 +58,11 @@ extensions = { "aln" : 	"clustal",
 
 
 # Colour map and plot colour
-colourmap = colors.ListedColormap([[0, 0, 0],
-								   [0, 0, 1],
-	 							   [1, 0, 0],
-	 							   [0, 1, 0],
-	 							   [1, 1, 1]])
+colourmap = colors.ListedColormap([[0.0,  0.0,  0.0],
+								   [0.1,  0.6,  0.25],
+	 							   [0.8,  0.1,  0.1],
+	 							   [1.0,  0.7,  0.4],
+	 							   [0.65, 0.85, 0.4]])
 
 
 c = (0.7686274509803922, 0.3058823529411765, 0.3215686274509804)
@@ -205,6 +205,7 @@ def align(filename, force, threads, full, full_iter, iter, auto) :
 
 
 		# Call ClustalO
+		print command
 		os.system(command)
 
 
