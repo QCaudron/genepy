@@ -1,4 +1,5 @@
 import os
+from subprocess import call
 
 from Bio import SeqIO
 from Bio.Alphabet import generic_dna
@@ -117,7 +118,7 @@ def alignmentarray(alignment, length = None, RNA = RNA) :
 
 	# Convert
 	for i, record in enumerate(alignment) :
-		X[i, :len(record.seq)] = [RNA.setdefault(nuc, 0) for nuc in record.seq] 
+		X[i, :len(record.seq)] = [RNA.get(nuc, 0) for nuc in record.seq] 
 
 	return np.array(X)
 
@@ -150,7 +151,7 @@ def readalignment(filename, extensions = extensions) :
 
 
 	# Check the file is of an interpretable filetype
-	if filename.split(".")[1] not in extensions.keys() :
+	if os.path.splitext(filename)[1][1:] not in extensions :
 		print "GenePy currently supports the following extensions :"
 		print "\n- ".join(extensions.keys())
 		return
@@ -160,11 +161,10 @@ def readalignment(filename, extensions = extensions) :
 	# Read in the records
 	X = []
 
-	f = open(filename, "rU")
-	for record in SeqIO.parse(f, extensions[filename.split(".")[1]]) :
-		X.append(record.upper())
+	with open(filename, "rU") as f :
+		for record in SeqIO.parse(f, extensions[os.path.splitext(filename)[1][1:]]) :
+			X.append(record.upper())
 
-	f.close()
 
 
 
@@ -187,7 +187,7 @@ def readalignment(filename, extensions = extensions) :
 
 
 
-def align(filename, force, threads, full, full_iter, iter, auto) :		
+def align(filename, force, threads, full, full_iter, it, auto) :		
 
 	# If the data isn't on disk already
 	if filename == "genepy.fasta" :
@@ -195,18 +195,18 @@ def align(filename, force, threads, full, full_iter, iter, auto) :
 
 	else :
 		# Generate flags
-		command = "clustalo -i %s -v -o %s_aligned_genepy.phy --outfmt=phy --wrap=60" % (filename, filename.split(".")[0])
+		command = "clustalo -i %s -v -o %s_aligned_genepy.phy --outfmt=phy --wrap=60" % (filename, os.path.splitext(filename)[0])
 		command += " --force" if force else ""
 		command += " --threads %d" % threads if threads else ""
 		command += " --full" if full else ""
 		command += " --full-iter" if full_iter else ""
-		command += " --iter %d" % iter if iter else ""
-		command += " --auto" if not (iter or full or full_iter) else ""
+		command += " --iter %d" % it if it else ""
+		command += " --auto" if not (it or full or full_iter) else ""
 
 
 		# Call ClustalO
 		print command
-		os.system(command)
+		call(command)
 
 
 	# Rewrite the file using BioPython, as ClustalO output fails in PhyML
@@ -374,7 +374,7 @@ def stats(s) :
 
 def phylotree(filename, nucleotide_frequency, bootstrap, search_algorithm) :
 
-	command = "phyml -d nt -m GTR -v e -i %s" % (filename.split(".")[0] + "_aligned_genepy.phy")
+	command = "phyml -d nt -m GTR -v e -i %s" % (os.path.splitext(filename)[0] + "_aligned_genepy.phy")
 	command += " -f e" if nucleotide_frequency == "empirical" else " -f m"
 	command += " -b %d" % bootstrap
 
@@ -389,12 +389,13 @@ def phylotree(filename, nucleotide_frequency, bootstrap, search_algorithm) :
 
 	if bootstrap > 1 :
 		try :
-			os.system("mpirun -np 8 %s" % command)
-		except :
-			os.system(command)
+			call("mpirun -np 8 %s" % command)
+		except OSError :
+			print "MPI not detected; running non-parallelised reconstruction."
+			call(command)
 
 	else :
-		os.system(command)
+		call(command)
 
 
 

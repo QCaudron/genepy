@@ -154,18 +154,18 @@ class seqarray :
 
 	def __iter__(self) :
 		"""Iterator function."""
-		self.iter = 0
+		self.it = 0
 		return self
 
 
 
 	def next(self) :
 		"""Next object in iteration."""
-		if self.iter == self.len :
+		if self.it == self.len :
 			raise StopIteration
 		else :
-			self.iter += 1
-			return self.seq[self.iter - 1]
+			self.it += 1
+			return self.seq[self.it - 1]
 
 
 
@@ -248,11 +248,11 @@ class seqarray :
 
 
 	# Align sequences 
-	def align(self, force = True, iter = False, full = False, full_iter = False, auto = True, threads = False) :
+	def align(self, force = True, it = False, full = False, full_iter = False, auto = True, threads = False) :
 		"""Align the array of sequences using ClustalO.
 
 		-- force : True / False; overwrite filename, if it exists
-		-- iter : False, integers > 0; iterate the guide tree
+		-- it : False, integers > 0; iterate the guide tree
 		-- full : True / False; use full distance matrix for guide-tree calculation
 		-- full_iter : True / False; use full distance matrix during iteration only
 		-- auto : True / False; automatically select options for speed and accuracy
@@ -260,7 +260,7 @@ class seqarray :
 		"""
 
 		# System call to ClustalO
-		genepy.align(self.filename, force, threads, full, full_iter, iter, auto)
+		genepy.align(self.filename, force, threads, full, full_iter, it, auto)
 
 		# Read alignment back in, rewrite it correctly for PhyML
 		"""
@@ -275,7 +275,7 @@ class seqarray :
 		SeqIO.write(tempseq, fout)
 		fout.close()
 		"""
-		self.seq = genepy.readalignment(self.filename.split(".")[0] + "_aligned_genepy.phy")
+		self.seq = genepy.readalignment(os.path.splitext(self.filename)[0] + "_aligned_genepy.phy")
 
 		self.user["Aligned"] = True
 		
@@ -309,7 +309,7 @@ class seqarray :
 		   pruning and regrafting; "BEST" for best of both
 		"""
 
-		if not os.path.isfile(self.filename.split(".")[0] + "_aligned_genepy.phy") :
+		if not os.path.isfile(os.path.splitext(self.filename)[0] + "_aligned_genepy.phy") :
 			print "GenePy can't find an aligned sequence file for %s.\nTry calling .align()." % \
 			self.filename.split("/")[-1]
 
