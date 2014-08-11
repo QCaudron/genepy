@@ -1,7 +1,6 @@
 import genepy
 
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 from Bio import SeqRecord
 
@@ -71,10 +70,6 @@ class seqarray :
 			raise TypeError("Expected a filename or a list of strings.")
 
 
-		# User-run operations
-		self.user = { "Aligned" : False,
-				 	  "Trimmed" : False }
-
 		# Generate static members
 		self.update()
 		
@@ -98,10 +93,8 @@ class seqarray :
 	def __str__(self) :
 		"""Long string representation of a genepy.seqarray object."""
 		out = self.__repr__()
-		out += ("\n-- C+G content : %.03f" % (self.statistics["C"].mean() + self.statistics["G"].mean()))
-		out += ("\n-- From file : %s" % self.filename.split("/")[-1])
-		out += ("\n-- User aligned : %r" % self.user["Aligned"])
-		out += ("\n-- User trimmed : %r" % self.user["Trimmed"])
+		out += ("-- C+G content : %.03f\n" % (self.statistics["C"].mean() + self.statistics["G"].mean()))
+		out += ("-- From file : %s" % self.filename.split("/")[-1])
 		return out
 
 
@@ -262,22 +255,10 @@ class seqarray :
 		# System call to ClustalO
 		genepy.align(self.filename, force, threads, full, full_iter, it, auto)
 
-		# Read alignment back in, rewrite it correctly for PhyML
-		"""
-		tempseq = []
-		fin = open(self.filename.split(".")[0] + "_aligned_genepy.phy")
-		
-		for record in SeqIO.parse(fin, "phy") :
-			tempseq.append(record.upper())
-		fin.close()
-		
-		fout = open(self.filename.split(".")[0] + "_aligned_genepy.phy", "w")
-		SeqIO.write(tempseq, fout)
-		fout.close()
-		"""
+
+		# Read aligned sequence array
 		self.seq = genepy.readalignment(os.path.splitext(self.filename)[0] + "_aligned_genepy.phy")
 
-		self.user["Aligned"] = True
 		
 		# Update static members
 		self.update()
@@ -359,7 +340,28 @@ class seqarray :
 		"""
 
 		self.seq = genepy.trimalignment(self.seq, array, left, right)
-		self.user["Trimmed"] = True
+		self.update()
+
+
+
+
+
+
+
+
+
+
+
+
+
+	def dropempties(self, fraction = 0.5) :
+		"""Remove any sequence containing less than a fraction of known nucleotides.
+
+		fraction : between 0 and 1. 
+
+		Useful after trimming to a given region of the genome."""
+
+		self.seq = genepy.dropempties(self.seq, fraction)
 		self.update()
 
 

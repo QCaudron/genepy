@@ -147,7 +147,7 @@ Displays :
 **Align sequences**
 
 ```python
-.align(force = True, iter = False, full = False, full_iter = False, auto = True, threads = False)
+.align(force = True, it = False, full = False, full_iter = False, auto = True, threads = False)
 ```
 
 Align the sequences in the `seqarray` by calling Clustal Omega. Sequences are clustered into a guide tree, which is used to guide a progressive alignment.
@@ -155,7 +155,7 @@ Align the sequences in the `seqarray` by calling Clustal Omega. Sequences are cl
 Arguments are command-line arguments to ClustalO.
 
 - `force` : overwrite the filename, if the output alignment file exists. The filename defaults to the filename of the sequence you passed on creation of the sequence array, without the extension, and with `_aligned_genepy.phy` appended. 
-- `iter` : the integer number of guide tree iterations. By default, no iteration of the guide tree is done. Iteration generates an alignment from the guide tree, then uses this alignment to generate a new guide tree. This iterated alignment procedure could give rise to better alignments at a linear cost in alignment time. Set to `False` for no iteration.
+- `it` : the integer number of guide tree iterations. By default, no iteration of the guide tree is done. Iteration generates an alignment from the guide tree, then uses this alignment to generate a new guide tree. This iterated alignment procedure could give rise to better alignments at a linear cost in alignment time. Set to `False` for no iteration.
 - `full` : use the full distance matrix for guide-tree calculation; default uses the fast clustering algorithm, mBed[<sup>5</sup>](#references) instead of constructing a full distance matrix. mBed calculates a reduced set of pairwise distances. Use `True` to iterate.
 - `full_iter` : use the full distance matrix for guide-tree calculation during guide-tree iteration only.
 - `auto` : sets options automatically, selecting options for both speed and accuracy according to the number of sequences. This could overwrite some of your other arguments. `auto = False` is automatically set if any of `iter`, `full`, or `full_iter` are set to `True`.
@@ -199,6 +199,35 @@ Construct a phylogenetic tree by calling PhyML.
 
 
 
+***
+
+**Drop sequences with low nucleotide count**
+
+```python
+.dropempties(fraction = 0.5)
+```
+
+Removes any sequences which have lower nucleotide fraction than specified. This is useful after aligning sequences that may contain different parts of the genome, and trimming to an area of interest; calling `seqarray.dropempties()` will the remove any sequences that don't contain information about this part of the genome.
+
+- `fraction` : the fraction of known nucleotides per site in the sequence, below which it is removed from the sequence array.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Sequencey Array Member Variables
 --------------------------------
 
@@ -211,7 +240,7 @@ Sequencey Array Member Variables
 Sequence Array Iteration
 ------------------------
 
-Sequence array objects can be iterated over. The iterables are [BioPython `Bio.Seq`](http://biopython.org/wiki/Seq) objects. For example :
+Sequence array objects are iterables. The elements are [BioPython `Bio.Seq`](http://biopython.org/wiki/Seq) objects. For example :
 
 ```python
 for record in mysequences :
@@ -226,7 +255,6 @@ CACCGGGCCCCTTGGGGCTGAAATTCAAGACCGTCCGCCCGGTTGCCCTGCCACGCGCGTTCGCACCACCCCGCAATGCG
 
 gi|513136723|gb|JX546593.1| 
 TCTCCGTAGCCGGCGTGTCGTGCAATGTTACCACTGAACACCCGTTCTGCAACACGCCGCACGGACAACTCGAGGTCCAGGTCCCGCCCGACCCTGGGGACCTGGTTGAGTACATTATGAATTACACCGGCAATCAACAGTCCCGGTGGGGCCTCGGGAGCCCGAACTGTCATGGCCCCGATTGGGCCTCCCCGGTTTGCCAACGCCATTCCCCTGACTGCTCGCGGCTTGTGGGGGCCACGCCAGAGCGTCCCCGGCTGCGCCTGGTTGACGCCGATGACCCCCTGCTGCGCACCGCCCCTGGGCCCGGCGAGGTGTGGGTCACGCCTGTCATAGGCTCTCAGGCGCGCAAGTGCGGACTCCACATACGCGCTGGACCGTACGGCCATGCTACCGTCGAAATGCCCGAGTGGATCCACGCCCACACCACCAGCGACCCTTGGCACCCACCGGGCCCCTTGGGGCTGAAGTTTAAGACGGTTCGCCCGGTGGTCCTGCCACGCGCGTTGGCGCCGCCCCGCAATGTGCGTGTGACCGGGTGCTACCAGTGCGGCACGCCCGCGCTGGTGGAAGGCCTTGCCCCCGGGGGAGGGAA
-
 ```
 
 

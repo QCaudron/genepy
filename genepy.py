@@ -1,5 +1,6 @@
 import os
 from subprocess import call
+from shutil import copyfileobj
 
 from Bio import SeqIO
 from Bio.Alphabet import generic_dna
@@ -194,22 +195,81 @@ def align(filename, force, threads, full, full_iter, it, auto) :
 		print "genepy !"# TODO : Write to disk !
 
 	else :
-		# Generate flags
-		command = "clustalo -i %s -v -o %s_aligned_genepy.phy --outfmt=phy --wrap=60" % (filename, os.path.splitext(filename)[0])
-		command += " --force" if force else ""
-		command += " --threads %d" % threads if threads else ""
-		command += " --full" if full else ""
-		command += " --full-iter" if full_iter else ""
-		command += " --iter %d" % it if it else ""
-		command += " --auto" if not (it or full or full_iter) else ""
+		# Generate flags :
+		command = ["clustalo", "-v", "--outfmt=phy"]
+
+		# Input file
+		command.append("-i")
+		command.append(filename)
+
+		# Output file
+		command.append("-o")
+		command.append("temp_genepy.phy")
+
+		# Force overwrite
+		if force :
+			command.append("--force")
+
+		# Limit threads
+		if threads :
+			command.append("--threads")
+			command.append(threads)
+
+		# Full distance matrix
+		if full :
+			command.append("--full")
+
+		# Full distance matrix during iteration only
+		if full_iter :
+			command.append("--full-iter")
+
+		# Iteration
+		if it :
+			command.append("--iter")
+			command.append(it)
+
+		if not (it or full or full_iter) :
+			command.append("--auto")
 
 
 		# Call ClustalO
-		print command
+		print " ".join(command)
 		call(command)
 
 
-	# Rewrite the file using BioPython, as ClustalO output fails in PhyML
+
+
+		# Determine number of lines in file
+		with open("temp_genepy.phy", "r") as infile :
+			for linecount, temp in enumerate(infile) :
+				pass
+
+
+		with open(os.path.splitext(filename)[0] + "_aligned_genepy.phy", "w") as outfile, open("temp_genepy.phy", "r") as infile :
+
+			# The number of lines to change ( sequence number )
+			l1 = infile.readline()
+			N = int(l1.split(" ")[1])
+
+			# Drop header in out-file
+			outfile.write(l1)
+
+			# Now write the next N lines, adding a space after the sequence name
+			for i in range(N) :
+				line = infile.readline()
+				outfile.write(line[:10] + " " + line[10:])
+			
+			# Copy the rest of the file as-is
+			copyfileobj(infile, outfile)
+
+		
+		os.remove("temp_genepy.phy")
+		print "File rewritten as PhyML-useable input to %s" % (os.path.splitext(filename)[0] + "_aligned_genepy.phy")
+
+
+
+
+		# Rewrite the file, as ClustalO output fails in PhyML
 	"""
 	s = readalignment(filename.split(".")[0] + "_aligned_genepy.phy")
 
@@ -246,10 +306,16 @@ def calcstats(seq) :
 	#stats["lengths"] = 
 
 	for a in seq :
-		stats["A"].append(a.seq.count("A") / float(len(a.seq)))
-		stats["C"].append(a.seq.count("C") / float(len(a.seq)))
-		stats["G"].append(a.seq.count("G") / float(len(a.seq)))
-		stats["T"].append(a.seq.count("T") / float(len(a.seq)))
+		A = a.seq.count("A")
+		C = a.seq.count("C")
+		G = a.seq.count("G")
+		T = a.seq.count("T")
+		ACGT = float(A + C + G + T)
+
+		stats["A"].append(A / ACGT)
+		stats["C"].append(C / ACGT)
+		stats["G"].append(G / ACGT)
+		stats["T"].append(T / ACGT)
 
 		for i, base1 in enumerate("ACGT") :
 			for j, base2 in enumerate("ACGT") :
@@ -261,7 +327,7 @@ def calcstats(seq) :
 	stats["G"] = np.array(stats["G"])
 	stats["T"] = np.array(stats["T"])
 
-	stats["transition"] /= len(seq)
+	stats["transition"] /= np.sum(stats["transition"])
 
 	return stats
 
@@ -374,25 +440,51 @@ def stats(s) :
 
 def phylotree(filename, nucleotide_frequency, bootstrap, search_algorithm) :
 
-	command = "phyml -d nt -m GTR -v e -i %s" % (os.path.splitext(filename)[0] + "_aligned_genepy.phy")
-	command += " -f e" if nucleotide_frequency == "empirical" else " -f m"
-	command += " -b %d" % bootstrap
+	command = ["phyml", "-d", "nt", "-m", "GTR", "-v", "e"]
 
+	# Input file
+	command.append("-i")
+	command.append(os.path.splitext(filename)[0] + "_aligned_genepy.phy")
 
-	if search_algorithm == "SPR" :
-		command += " -s SPR"
-	elif search_algorithm == "NNI" :
-		command += " -s NNI"
+	# Nucleotide frequencies
+	command.append("-f")
+	if nucleotide_frequency == "empirical" :
+		command.append("e")
+	elif nucleotide_frequency == "max_likelihood" :
+		command.append("m")
 	else :
-		command += " -s BEST"
+		print "WARNING : Unrecognised option for nucleotide_frequency; setting to empirical."
+		command.append("e")
+
+	# Bootstrapping
+	command.append("-b")
+	command.append(str(bootstrap))
+
+	# Search algorithm
+	command.append("-s")
+	if search_algorithm == "SPR" :
+		command.append("SPR")
+	elif search_algorithm == "NNI" :
+		command.append("NNI")
+	elif search_algorithm == "BEST" :
+		command.append("BEST")
+	else :
+		print "WARNING : Unrecognised option for search_algorithm; setting to BEST."
+		command.append("BEST")
+
+
+	print " ".join(command)
 
 
 	if bootstrap > 1 :
 		try :
-			call("mpirun -np 8 %s" % command)
+			command.insert(0, "8")
+			command.insert(0, "-np")
+			command.insert(0, "mpirun")
+			call(command)
 		except OSError :
 			print "MPI not detected; running non-parallelised reconstruction."
-			call(command)
+			call(command[3:])
 
 	else :
 		call(command)
@@ -434,6 +526,65 @@ def trimalignment(alignment, array = None, left = None, right = None) :
 			X.append(seq[left:right])
 
 		return X
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def dropempties(alignment, fraction) :
+
+	def density(seq) :
+		known = seq.seq.count("A") + \
+				seq.seq.count("C") + \
+				seq.seq.count("G") + \
+				seq.seq.count("T")
+
+		return known / float(len(seq))
+
+
+	# Count ACGT
+	return [seq for seq in alignment if density(seq) > fraction]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
