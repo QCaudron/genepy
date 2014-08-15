@@ -1,0 +1,10 @@
+setup.cfg
+setup.py
+genepy/__init__.py
+genepy/genepy.py
+genepy/seqarray.py
+genepy.egg-info/PKG-INFO
+genepy.egg-info/SOURCES.txt
+genepy.egg-info/dependency_links.txt
+genepy.egg-info/not-zip-safe
+genepy.egg-info/top_level.txt

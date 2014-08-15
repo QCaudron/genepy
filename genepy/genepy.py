@@ -310,7 +310,7 @@ def calcstats(seq) :
 		C = a.seq.count("C")
 		G = a.seq.count("G")
 		T = a.seq.count("T")
-		ACGT = float(A + C + G + T)
+		ACGT = max(float(A + C + G + T), 1)
 
 		stats["A"].append(A / ACGT)
 		stats["C"].append(C / ACGT)
