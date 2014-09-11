@@ -31,15 +31,17 @@ We have a file in [FASTA](http://en.wikipedia.org/wiki/FASTA_format) format from
 ```python
 import genepy
 
-mysequences = genepy.seqarray("rubellaE1.fasta")
+mysequences = genepy.seqarray("tutorial/rubella_samples.fasta")
 
 mysequences.show()
 ```
 
 
-![.show() - visually display the sequence array](tutorial_images/figure_1.png)
+![.show() - visually display the sequence array](tutorial/figure_1.png)
 
-They're not aligned, and one is much longer than the others. Let's dig a little deeper by printing a summary of the sequence array.
+Different colours represent different nucleotides. They're not aligned, and one is much longer 
+than the 
+others. Let's dig a little deeper by printing a summary of the sequence array.
 
 ```python
 mysequences
@@ -47,35 +49,35 @@ mysequences
 
 This returns :
 
-	GenePy sequence set :
-	-- 31 sequences
-	-- Mean length : 987.6 (min 286, max 9777)
-	-- C+G content : 0.677
-	-- From file : rubellaE1.fasta
+	GenePy sequence set (genepy.seqarray) :
+	-- 32 sequences
+	-- Mean length : 1697.2 (min 739, max 9762)
 
-We have a wide range of sequence lengths. Most are small, but based on the visualisation, we have one that's probably a full genome. Our next step will be to align them and cut away parts of sequences that we don't have enough duplicates for.
+We have a wide range of sequence lengths. Most are small, but based on the visualisation, we have two that are probably a full genome. Our next step will be to align them and cut away parts of sequences that we don't have enough duplicates for.
 
 ```python
 mysequences.align()
 ```
 
-We've aligned the sequences with the default **GenePy** arguments to Clustal Omega. A new file was written to disk : `rubellaE1_aligned_genepy.phy`. This file, in PHYLIP file format, acts as a checkpoint for your future work. Let's visualise the result.
+We've aligned the sequences with the default **GenePy** arguments to Clustal Omega. A new file 
+was written to disk : `rubella_samples_aligned_genepy.phy`. This file, in PHYLIP file format, 
+acts as a checkpoint for your future work. Let's visualise the result.
 
 ```python
 mysequences.show()
 ```
 
-![Updated visualisation after sequence alignment](tutorial_images/figure_2.png)
+![Updated visualisation after sequence alignment](tutorial/figure_2.png)
 
 Most of the sequences belong to the E1 glycoprotein gene. Let's trim excess from the left and right, so we're comparing like with like.
 
 ```python
-mysequences.trimalignment(left = 8700, right = 9500)
+mysequences.trimalignment(left = 8750, right = 9470)
 
 mysequences.show()
 ```
 
-![Updated visualisation after sequence trimming](tutorial_images/figure_3.png)
+![Updated visualisation after sequence trimming](tutorial/figure_3.png)
 
 Our sequence array is now shorter in terms of nucleotides per sequence. We're considering the same parts of the genome for each sequence, so we can start to look at the nucleotide statistics.
 
@@ -83,7 +85,7 @@ Our sequence array is now shorter in terms of nucleotides per sequence. We're co
 mysequences.stats()
 ```
 
-![Sequence statistics](tutorial_images/figure_4.png)
+![Sequence statistics](tutorial/figure_4.png)
 
 This shows us the average nucleotide content, distributions of nucleotide frequencies across difference sequences, and the frequencies of two-step nucleotide transitions. We see that there's a very high cytosine and guanine content, and that cytosines tend to be followed by more cytosines, although CpG and GpC are also common. The high C+G content is an interesting feature of the rubella virus, which is somewhat of an outlier in this respect amongst ssRNA viruses.
 
